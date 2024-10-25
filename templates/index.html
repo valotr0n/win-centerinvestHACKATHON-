@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IT Helper</title>
+    <script type="text/javascript" src="eel.js"></script>
+    <script src="/assets/js/script.js" defer></script>
+    <link rel="stylesheet" href="/assets/css/cssforhtml.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <div class="homeWindow">
+          <button id="close1" class="close"><img src="assets/img/closeMain.svg" alt="" /></button>
+          <div class="homeWindowHead">
+            <p>Бот-Цибуля</p>
+            <a href="https://www.centrinvest.ru/"
+              ><img src="assets/img/person.svg" alt=""
+            /></a>
+          </div>
+          <div class="homeWindowInfo">
+            <div class="homeImg1"><img src="assets/img/purpleCat.png" alt="" /></div>
+
+            <p>Привет! Я Бот-Цибуля. Я помогу тебе решить ту или иную проблему. Начнем?</p>
+
+            <div class="getStart">
+              <button id="btnGetStart">Начать</button>
+            </div>
+
+            <div class="homeImg2"><img src="assets/img/purpleLines.svg" alt="" /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalMain" class="modalMain">
+      <div class="modal-content">
+        <div class="homeWindow">
+          <button id="close2" class="close"><img src="assets/img/closeMain.svg" alt="" /></button>
+          <div class="homeWindowHead">
+            <p>Робот Бот-Цибуля</p>
+            <a href="https://www.centrinvest.ru/"
+              ><img src="/web/img/person.svg" alt="" />
+            </a>
+          </div>
+
+          <div class="mainWindowInfo">
+            <div class="mainDate"><p>Сегодня</p></div>
+
+            <div class="chatBoxInput">
+              <ul class="chatBox">
+                <li class="chat chatIncoming">
+                  <div class="incomingImg"><img src="assets/img/purpleCat2.png" alt="" /></div>
+                  <p>
+                    Привет! Я Цибуля. <br />
+                    Опиши мне свою <br />
+                    проблему и я помогу тебе!
+                  </p>
+                </li>
+              </ul>
+
+              <div class="chatInputBc">
+                <div class="result-box"></div>
+                <div class="chatInput">
+                  <button id="mainQuestion">
+                    <img src="assets/img/mainQuestion.svg" alt="" />
+                  </button>
+                  <textarea id="textarea" placeholder="Спросить..." required></textarea>
+                  <button id="btnChat"><img src="assets/img/mainSend.svg" alt="" /></button>
+                  <div id="timer"></div>
+                  <button id="VoiceChat"><img src="assets/img/microphone.svg" alt="" /></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalQuestion" class="modalQuestion">
+      <div class="modal-content">
+        <div class="homeWindow">
+          <button id="close3" class="close"><img src="assets/img/closeMain.svg" alt="" /></button>
+          <div class="homeWindowHead">
+            <p>Частые вопросы:</p>
+            <a href="https://www.centrinvest.ru/"
+              ><img src="assets/img/person.svg" alt=""
+            /></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button id="openModal"><img src="assets/img/mainlogogren.png" alt="" /></button>
+  </body>
+</html>
