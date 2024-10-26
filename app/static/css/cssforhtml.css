@@ -1,0 +1,366 @@
+* {
+    margin: 0;
+    box-sizing: border-box;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+  }
+  
+  /* Home */
+  body {
+     oveflow: hidden;
+  }
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.83);
+  }
+  
+  .modal-content {
+    /* some rules */
+  }
+  
+  .close {
+    background: transparent;
+    border: none;
+    position: absolute;
+    left: -20px;
+    top: -20px;
+    cursor: pointer;
+  }
+  
+  .close2 {
+    background: transparent;
+    border: none;
+    position: absolute;
+    left: -20px;
+    top: -20px;
+    cursor: pointer;
+  }
+  
+  #openModal {
+    /* background-color: white; */
+    border: none;
+    background: transparent;
+    position: absolute;
+    bottom: -3%;
+    left: 2%;
+    cursor: pointer;
+  }
+  
+  .homeWindow {
+    max-width: 606px;
+    background: rgb(82, 192, 38);
+    background: linear-gradient(180deg, rgb(15, 175, 66) 15%, rgba(255, 255, 255, 1) 100%);
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    border-radius: 27px;
+    padding: 21px 0 104px 0;
+    position: relative;
+    top: 205px;
+    /* heigth убрать чтоб было как в макете */
+    height: 695px;
+  }
+  
+  .homeWindowInfo {
+    margin: auto;
+  }
+  
+  .homeWindowHead {
+    display: flex;
+    max-width: 520px;
+    margin: 0 19px 15px 68px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .homeWindowHead p {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+  }
+  
+  .homeImg1 {
+    max-width: 203px;
+    margin: 0 auto;
+  }
+  
+  .homeWindowInfo p {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 auto;
+    text-align: center;
+    max-width: 301px;
+    margin-bottom: 24px;
+  }
+  
+  #btnGetStart {
+    font-size: 24px;
+    color: #67f93f;
+    background: white;
+    border: none;
+    padding: 17px 58px 17px 58px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    width: 100%;
+    cursor: pointer;
+  }
+  
+  .getStart {
+    max-width: 210px;
+    margin: 0 auto;
+  }
+  
+  .homeImg2 {
+    max-width: 97px;
+    margin: 0 auto;
+  }
+  
+  /* Main */
+  
+  .modalMain {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.83);
+  }
+  
+  /* Scroll bar */
+  
+  .chatBox::-webkit-scrollbar {
+    width: 6px; /* ширина для вертикального скролла */
+    background-color: none;
+  }
+  
+  .chatBox::-webkit-scrollbar-thumb {
+    /* background-color: #c23ff9; */
+    background: linear-gradient(180deg, rgb(85, 193, 71) 15%, rgba(255, 255, 255, 1) 100%);
+    border-radius: 9em;
+    /* box-shadow: inset 1px 1px 10px #f3faf7; */
+  }
+  
+  .chatBox::-webkit-scrollbar-track {
+    background-color: none; /* цвет дорожки */
+  }
+  
+  .chatBox::-webkit-scrollbar-button:vertical:start:decrement {
+    display: none;
+  }
+  
+  .chatBox::-webkit-scrollbar-button:vertical:end:increment {
+    display: none;
+  }
+  
+  /* Scroll bar */
+  
+  .mainWindowInfo {
+    /* height: 450px; так по макету */
+    height: 600px;
+    overflow: auto; /* можно поменять на auto/scroll */
+    scrollbar-width: thin;
+    scrollbar-color: hsl(0 0% 50%);
+  }
+  
+  .mainDate {
+    font-size: 20px;
+    font-weight: 400;
+    color: #fff;
+    text-align: center;
+    padding: 5px 15px;
+    background-color: rgba(255, 255, 255, 0.52);
+    max-width: 115px;
+    margin: 0 auto;
+    margin-bottom: 32px;
+    border-radius: 17px;
+  }
+  
+  .chatBox {
+    max-width: 538px;
+    margin: 0 auto;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .chatIncoming {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  
+  .incomingImg {
+    width: 122px;
+    height: 69px;
+    margin-left: 10px;
+  }
+  
+  .incomingImg img {
+    width: 100%;
+  }
+  
+  .chatBox p {
+    font-size: 20px;
+    font-weight: 500;
+    color: #525252;
+    background-color: #fff;
+    padding: 18px 10px 17px 14px;
+    max-width: fit-content;
+  }
+  
+  .chatIncoming p {
+    border-radius: 18px 18px 18px 0;
+    margin: 0 0 9px 0;
+  }
+  
+  .chatOutgoing {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .chatOutgoing p {
+    border-radius: 18px 18px 0 18px;
+    margin: 18px 0 9px 0;
+  }
+  
+  .chatInput {
+    max-width: 538px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .chatInputBc {
+    overflow: hidden;
+    position: absolute;
+    bottom: 0;
+    border-top: 1px solid #ccc;
+    width: 100%;
+    background-color: #efefef;
+  
+    border-bottom-left-radius: 27px;
+    border-bottom-right-radius: 27px;
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+    transition: border-top-left-radius 500ms ease, border-top-right-radius 500ms ease;
+  }
+  
+  #btnChat {
+    border: none;
+    display: none;
+  }
+  
+  #VoiceChat {
+    border: none;
+  }
+  
+  #textarea {
+    overflow: hidden;
+    border: none;
+    outline: none;
+    font-size: 0.95rem;
+    resize: none;
+    padding: 16px 16px 0 16px;
+    margin: 24px 0 24px 0;
+    width: 77%;
+    background-color: #d2d3d8;
+    border-radius: 24px;
+    font-size: 20px;
+    line-height: 20px;
+    transition: all 1s ease-in-out;
+  }
+  
+  #textarea:hover {
+  }
+  
+  #mainQuestion {
+    border: none;
+  }
+  
+  /* question */
+  
+  .modalQuestion {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.83);
+  }
+  
+  .result-box {
+    overflow: hidden;
+    transition: height 500ms ease-in-out;
+    height: 0;
+    border-bottom: 1px solid rgb(68, 166, 48);
+  }
+  
+  .result-box ul {
+    display: flex;
+    gap: 15px;
+    margin-left: 25px;
+    margin-right: 25px;
+    border-radius: 8px;
+    width: fit-content;
+    padding: 0px 8px;
+  }
+  
+  .result-box ul li {
+    background: #ffdae6;
+    display: inline;
+    border-radius: 8px;
+    padding: 0px 8px;
+    margin: 5px 0px;
+    color: #3ff93f;
+  }
+  
+  #timer {
+    /* display: inline-block; */
+    display: none;
+    position: relative;
+  }
+  
+  .timerOnClick {
+    display: inline-block;
+    transition-property: display;
+  }
+  
+  #timer::after {
+    content: '';
+    width: 0.75rem;
+    height: 0.75rem;
+    background: red;
+    border-radius: 0.375rem;
+    position: absolute;
+    top: 50%;
+    margin-top: -0.375rem;
+    left: 5px;
+    animation: recording 1.5s infinite;
+  }
+  
+  @keyframes recording {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+  

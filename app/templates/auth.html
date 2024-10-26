@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <base href="/" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация и Регистрация</title>
+    <link rel="stylesheet" href="/static/styles.css"> <!-- Подключение CSS файла -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <a href="https://example.com" class="logo">
+            <!-- <svg viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="25" cy="25" r="20" fill="#4CAF50"/>
+                <path d="M20 25L23 28L30 21" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg> -->
+            <span class="logo-text">ЦЕНТР-ИНВЕСТ</span>
+        </a>
+        <nav class="nav-links">
+            <a href="https://www.centrinvest.ru/about" class="nav-link">О нас</a>
+            <a href="https://www.centrinvest.ru/" class="nav-link">Услуги</a>
+            <a href="https://www.centrinvest.ru/about/contacts" class="nav-link">Контакты</a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% if authorized %}
+            <!-- Блок для авторизованных пользователей -->
+            <h2>Добро пожаловать, {{ user.email }}!</h2>
+            <p>Данный сайт был создан для легкой адаптации студентов</p>
+            <p>Во время обучения в ВУЗе студенты сталкиваются с различными проблемами, связанными с взрослением и ответственными задачами, включая:
+                Проживание: трудности с поиском общежития или аренды жилья.
+                Оплата обучения: финансовые вопросы для студентов на коммерческой основе.
+                Поездки: организационные моменты и финансовое планирование для поездок.
+                Стажировки: предложения от работодателей для студентов.
+                Финансы: использование калькуляторов для расчетов кредитов, построение плана расходов и напоминания о платежах.</p>
+                <a href="/pages/bot">Облегчить жизнь</a>
+            <a href="/pages/bot"><button id="openModal"><img src="/static/img/purpleCat2.png" alt="" /></button></a>
+        {% else %}
+        
+                <div class="tabs">
+                    <div class="tab active" data-tab="login">Вход</div>
+                    <div class="tab" data-tab="register">Регистрация</div>
+                </div>
+                
+                <div class="form-container">
+                    <form id="loginForm" action="/pages/login" method="post">
+                        <div class="form-group">
+                            <label for="loginEmail">Email</label>
+                            <input type="email" name="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Пароль</label>
+                            <input type="password" name="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit">Войти</button>
+                    </form>
+    
+                    <form id="registerForm" action="/pages/register" method="post" style="display: none;">
+                        <div class="form-group">
+                            <label for="registerEmail">Email</label>
+                            <input type="email" name="email" id="registerEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPassword">Пароль</label>
+                            <input type="password" name="password" id="registerPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Подтвердите пароль</label>
+                            <input type="password" name="confirm_password" id="confirmPassword" required>
+                        </div>
+                        <button type="submit">Зарегистрироваться</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+        
+    </main>
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Настройка уведомлений toastr
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "3000"
+            };
+
+            const tabs = document.querySelectorAll('.tab');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+
+            // Переключение между табами
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    if (tab.dataset.tab === 'login') {
+                        loginForm.style.display = 'block';
+                        registerForm.style.display = 'none';
+                    } else {
+                        loginForm.style.display = 'none';
+                        registerForm.style.display = 'block';
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+
+            loginForm.onsubmit = async function(event) {
+                event.preventDefault();
+                const formData = new FormData(loginForm);
+                const response = await fetch('/pages/login', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    // Обновляем интерфейс, показывая сообщение и информацию о пользователе
+                    document.querySelector('.main-content').innerHTML = `
+            <h2>Добро пожаловать, ${result.email}!</h2>
+            <p>Данный сайт был создан для легкой адаптации студентов</p>
+            <p>Во время обучения в ВУЗе студенты сталкиваются с различными проблемами, связанными с взрослением и ответственными задачами, включая:
+                Проживание: трудности с поиском общежития или аренды жилья.
+                Оплата обучения: финансовые вопросы для студентов на коммерческой основе.
+                Поездки: организационные моменты и финансовое планирование для поездок.
+                Стажировки: предложения от работодателей для студентов.
+                Финансы: использование калькуляторов для расчетов кредитов, построение плана расходов и напоминания о платежах.</p>
+                <a href="/pages/bot">Облегчить жизнь</a>
+            <a href="/pages/bot"><button id="openModal"><img src="/static/img/purpleCat2.png" alt="" /></button></a>
+                    `;
+                } else {
+                    alert(result.message);  // Показываем ошибку
+                }
+            };
+
+            registerForm.onsubmit = async function(event) {
+                event.preventDefault();
+                const formData = new FormData(registerForm);
+                const response = await fetch('/pages/register', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    // Обновляем интерфейс
+                    document.querySelector('.main-content').innerHTML = `
+                        <h2>Пользователь ${result.user.email} успешно зарегистрирован!</h2>
+                    `;
+                } else {
+                    alert(result.message);  // Показываем ошибку
+                }
+            };
+        });
+    </script>
+</body>
+</html>
