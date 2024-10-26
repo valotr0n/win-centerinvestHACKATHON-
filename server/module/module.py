@@ -81,7 +81,6 @@ def get_response(prediction, intents_json):
 
 
 async def chat(message):
-    print("Начните общение с ботом (напишите 'выход' для завершения)")
     while True:
         if message.lower() == "выход":
             return "До свидания"
@@ -89,8 +88,6 @@ async def chat(message):
 
         bag = preprocess_sentence(message)
         bag = np.expand_dims(bag, axis=0)
-
-        # Предсказание
         prediction = model.predict(bag)[0]
         response = get_response(prediction, data)
 

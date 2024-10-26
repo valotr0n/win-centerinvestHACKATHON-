@@ -115,18 +115,35 @@ async function ResponseToMessage()  {
 }
 
 
-//async function RecordVoice(){
-//        record = true;
-//        console.log('возня');
-//        eel.start_voice(1);
-//        sentBtn.style.display = 'block';
-//        VoiceChat.style.display = 'none';
-//        while (record){
-//            textarea.value = (await eel.record_voice()());
-//        }
-//        textarea.value = ''
-//        eel.start_voice(0);
-//}
+async function RecordVoice(){
+        record = true;
+        console.log('возня');
+
+        const request = new Request("/api/voice/start_voice/1", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
+
+        sentBtn.style.display = 'block';
+        VoiceChat.style.display = 'none';
+        while (record) {
+            const response = await fetch('/api/voice/recognize/');
+            const data = await response.json();
+            if (response.status === 200) {
+                textarea.value = data.result;
+            } else {
+                break;
+            }
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Пауза в 1 секунду
+        }
+        textarea.value = ''
+}
+
+
+
+
 
 
 VoiceChat.onclick = function () {
@@ -144,7 +161,7 @@ document.addEventListener('keydown', event => {
 
 sentBtn.addEventListener('click', ResponseToMessage);
 
-// VoiceChat.addEventListener('click', RecordVoice);
+ VoiceChat.addEventListener('click', RecordVoice);
 
 
 
