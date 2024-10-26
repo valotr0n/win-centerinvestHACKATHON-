@@ -28,6 +28,8 @@ async function GenerateResponseToMessage(b) {
 }
 
 
+
+// Возможный запрос сверху инпута. Изменить
 async function ForResultBox(text){
     const results_for_box = await eel.results_box(text)();
     if (!results_for_box){
@@ -46,7 +48,7 @@ async function ForResultBox(text){
     }
     }
 }
-
+// выбрать возможный ответ
 function selectInput(new_value){
       textarea.value = new_value[0].replace(/_/g, " ");
       sentBtn.click();
@@ -79,6 +81,7 @@ const createChatLi = (message, className) => {
 };
 
 
+// Отправить
 async function ResponseToMessage()  {
         record = false;
         resultsBox.innerHTML = '';
@@ -89,28 +92,37 @@ async function ResponseToMessage()  {
         chatBoxBC.style.borderTopRightRadius = "0";
         chatBoxBC.style.borderTopLeftRadius = "0";
         userMessage = chatInput.value.trim();
-        console.log(userMessage);
         if (!userMessage) return;
         chatBox.appendChild(createChatLi(userMessage, 'chatOutgoing'));
         let message_to_response = textarea.value;
         textarea.value = '';
-        chatBox.appendChild(createChatLi(await GenerateResponseToMessage(message_to_response), 'chatIncoming'));
+        console.log(`${message_to_response}`)
+
+
+        // POST-запрос
+        const request = new Request("http://127.0.0.1:8000/api/message", {
+          method: "POST",
+          body: JSON.stringify({ text_content: `${message_to_response}` }),
+        });
+        const response1 = await request.json();
+        console.log(response1);
+        chatBox.appendChild(createChatLi(response1['text_content'], 'chatIncoming'));
 
 }
 
 
-async function RecordVoice(){
-        record = true;
-        console.log('возня');
-        eel.start_voice(1);
-        sentBtn.style.display = 'block';
-        VoiceChat.style.display = 'none';
-        while (record){
-            textarea.value = (await eel.record_voice()());
-        }
-        textarea.value = ''
-        eel.start_voice(0);
-}
+//async function RecordVoice(){
+//        record = true;
+//        console.log('возня');
+//        eel.start_voice(1);
+//        sentBtn.style.display = 'block';
+//        VoiceChat.style.display = 'none';
+//        while (record){
+//            textarea.value = (await eel.record_voice()());
+//        }
+//        textarea.value = ''
+//        eel.start_voice(0);
+//}
 
 
 VoiceChat.onclick = function () {
@@ -128,10 +140,9 @@ document.addEventListener('keydown', event => {
 
 sentBtn.addEventListener('click', ResponseToMessage);
 
-VoiceChat.addEventListener('click', RecordVoice);
+// VoiceChat.addEventListener('click', RecordVoice);
 
 
-// ChatBox
 
 btn.onclick = function () {
   modal.style.display = 'block';
@@ -162,3 +173,5 @@ question.onclick = function () {
   modalMain.style.display = 'none';
   modalQuestion.style.display = 'block';
 };
+
+
