@@ -1,204 +1,118 @@
-import random
 import json
-import pickle
 import numpy as np
-
+import random
 import nltk
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords
-
+import pickle
+from nltk.stem import SnowballStemmer
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, LSTM, Embedding
+from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.optimizers import SGD
-from tensorflow.keras.regularizers import l2
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
-import tensorflow as tf
-import matplotlib.pyplot as plt
-
-import os
-
 # Загрузка необходимых ресурсов NLTK
-
 nltk.download('punkt')
-nltk.download('wordnet')
-nltk.download('stopwords')
 
-# Инициализация лемматизатора и стоп-слов
-lemmatizer = WordNetLemmatizer()
-stop_words = set(stopwords.words('russian'))
+# Инициализация стеммера
+stemmer = SnowballStemmer("russian")
 
-# -------------- Предобработка и Подготовка Данных --------------
+# Загрузка датасета
+with open('intents.json', 'r', encoding='utf-8') as file:
+    data = json.load(file)
 
-# Проверка наличия файла 'intents.json'
-if not os.path.exists('../server/module/intents.json'):
-    raise FileNotFoundError("Файл 'intents.json' не найден в текущей директории.")
-
-# Загрузка данных из intents.json
-with open('../server/module/intents.json', 'r', encoding='utf-8') as json_file:
-    intents = json.load(json_file)
-
-# Проверка содержимого intents
-print(json.dumps(intents, indent=4, ensure_ascii=False))
-
-# Инициализация списков
+# Парсинг данных
 words = []
-classes = []
-documents = []
-ignore_letters = ['?', '!', '.', ',']
+labels = []
+docs = []
+responses = {}
+sub_intents = {}
 
-# Обработка данных из intents
-for intent in intents['intents']:
+for intent in data['intents']:
+    label = intent['tag']
+    labels.append(label)
+    responses[label] = intent['responses']
+
+    # Обработка основных паттернов
     for pattern in intent['patterns']:
-        word_list = nltk.word_tokenize(pattern, language='russian')  # Добавлен параметр language='russian'
-        words.extend(word_list)
-        documents.append((word_list, intent['tag']))
-        if intent['tag'] not in classes:
-            classes.append(intent['tag'])
+        # Токенизация каждого паттерна
+        tokens = nltk.word_tokenize(pattern.lower())
+        words.extend(tokens)
+        docs.append((tokens, label))
 
-# Лемматизация и удаление дубликатов, стоп-слов
-words = [lemmatizer.lemmatize(word.lower()) 
-         for word in words 
-         if word not in ignore_letters and word.lower() not in stop_words]
-words = sorted(set(words))
+    # Обработка под-интентов
+    if 'sub_intents' in intent:
+        for sub_intent in intent['sub_intents']:
+            sub_label = sub_intent['tag']
+            labels.append(sub_label)
+            responses[sub_label] = sub_intent['responses']
+            for pattern in sub_intent['patterns']:
+                tokens = nltk.word_tokenize(pattern.lower())
+                words.extend(tokens)
+                docs.append((tokens, sub_label))
 
-classes = sorted(set(classes))
+# Предобработка слов
+words = [stemmer.stem(w) for w in words if w.isalnum()]
+words = sorted(list(set(words)))
 
-# Сохранение словаря слов и классов
-pickle.dump(words, open('../server/module/words.pkl', 'wb'))
-pickle.dump(classes, open('../server/module/classes.pkl', 'wb'))
+labels = sorted(list(set(labels)))
 
-# Создание обучающего набора данных
+# Создание обучающих данных
 training = []
-output_empty = [0] * len(classes)
+output_empty = [0] * len(labels)
 
-for document in documents:
+for doc in docs:
     bag = []
-    word_patterns = document[0]
-    word_patterns = [lemmatizer.lemmatize(word.lower()) for word in word_patterns]
-    for word in words:
-        bag.append(1) if word in word_patterns else bag.append(0)
+    pattern_words = [stemmer.stem(word) for word in doc[0]]
+    for w in words:
+        bag.append(1) if w in pattern_words else bag.append(0)
 
+    # Создание метки
     output_row = list(output_empty)
-    output_row[classes.index(document[1])] = 1
+    output_row[labels.index(doc[1])] = 1
     training.append([bag, output_row])
 
-# Перемешивание данных
+# Перемешивание данных и разделение на X и y
 random.shuffle(training)
+training = np.array(training, dtype=object)
 
-# Проверка длины bag и output_row
-for idx, pair in enumerate(training):
-    bag, output_row = pair
-    if len(bag) != len(words):
-        print(f"Ошибка в bag на позиции {idx}: длина {len(bag)} не равна {len(words)}")
-    if len(output_row) != len(classes):
-        print(f"Ошибка в output_row на позиции {idx}: длина {len(output_row)} не равна {len(classes)}")
+X = list(training[:, 0])
+y = list(training[:, 1])
 
-# Разделение на признаки и метки
-train_x = []
-train_y = []
+# Разделение на обучающую и тестовую выборки
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-for pair in training:
-    train_x.append(pair[0])
-    train_y.append(pair[1])
+# Преобразование в numpy массивы
+X_train = np.array(X_train)
+X_test = np.array(X_test)
+y_train = np.array(y_train)
+y_test = np.array(y_test)
 
-train_x = np.array(train_x)
-train_y = np.array(train_y)
-
-# Проверка формы данных
-print(f"train_x shape: {train_x.shape}")
-print(f"train_y shape: {train_y.shape}")
-
-# -------------- Построение и Обучение Модели --------------
-
-#Создание модели нейронной сети с использованием Embedding и LSTM
-# model = Sequential()
-# model.add(Embedding(input_dim=len(words), output_dim=128, input_length=len(train_x[0]))) ХУЕТА ПОЛНАЯ ХЗ ПОЧ
-# model.add(LSTM(128, return_sequences=True))
-# model.add(Dropout(0.5))
-# model.add(LSTM(64))
-# model.add(Dropout(0.5))
-# model.add(Dense(len(train_y[0]), activation='softmax'))
-
-
+# Создание модели нейронной сети
 model = Sequential()
-model.add(Dense(128, input_shape=(len(train_x[0]), ), activation='relu',
-                kernel_regularizer=l2(1e-6)))
+model.add(Dense(128, input_shape=(len(words),), activation='relu'))
 model.add(Dropout(0.5))
-model.add(Dense(64, activation='relu', kernel_regularizer=l2(1e-6)))
+model.add(Dense(64, activation='relu'))
 model.add(Dropout(0.5))
-model.add(Dense(len(train_y[0]), activation='softmax'))
-
-
-
-
-
-# Создание оптимизатора SGD
-sgd = SGD(
-    learning_rate=0.01,
-    momentum=0.9,
-    nesterov=True,
-    name='SGD'
-)
-
-# Проверка версии TensorFlow для поддержки jit_compile
-print(f"TensorFlow version: {tf.__version__}")
+model.add(Dense(len(labels), activation='softmax'))
 
 # Компиляция модели
-if tf.__version__ >= '2.12':
-    # Компиляция с jit_compile
-    model.compile(
-        loss='categorical_crossentropy',
-        optimizer=sgd,
-        metrics=['accuracy'],
-        jit_compile=True
-    )
-else:
-    # Компиляция без jit_compile
-    model.compile(
-        loss='categorical_crossentropy',
-        optimizer=sgd,
-        metrics=['accuracy']
-    )
+sgd = SGD(learning_rate=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
-# Определение колбеков
-early_stop = EarlyStopping(
-    monitor='val_loss',
-    patience=10,
-    restore_best_weights=True
-)
-# Используйте расширение .keras или укажите save_format='h5'
-checkpoint = ModelCheckpoint(
-    'best_chatbot_model.keras', 
-    monitor='val_loss', 
-    save_best_only=True
-)
-# Если хотите сохранить в формате .h5
-# checkpoint = ModelCheckpoint(
-#     'best_chatbot_model.h5', 
-#     monitor='val_loss', 
-#     save_best_only=True, 
-#     save_format='h5'
-# )
+# Обучение модели
+model.fit(X_train, y_train, epochs=200, batch_size=5, verbose=1)
 
-# Обучение модели с использованием колбеков
-# hist = model.fit(
-#     train_x, train_y,
-#     epochs=200,
-#     batch_size=5,
-#     verbose=1,
-#     validation_data=(test_x, test_y),
-#     callbacks=[early_stop, checkpoint]
-# )
-hist = model.fit(train_x, train_y, epochs=200, batch_size=5, verbose=1)
+# Оценка модели
+loss, accuracy = model.evaluate(X_test, y_test)
+print(f'Потери: {loss}, Точность: {accuracy}')
 
-early_stop = EarlyStopping(
-    monitor='val_loss',
-    patience=20,  # Увеличено с 10 до 20
-    restore_best_weights=True
-)
-# Сохранение модели
-model.save('chatbot_model.h5')  # Можно также сохранить в формате .keras
-print('Модель успешно обучена и сохранена как \'chatbot_model.h5\'')
+# Сохранение модели и данных
+model.save('chatbot_model.h5')
+
+with open('words.pkl', 'wb') as f:
+    pickle.dump(words, f)
+
+with open('labels.pkl', 'wb') as f:
+    pickle.dump(labels, f)
+
+print("Модель и данные успешно сохранены.")

@@ -39,7 +39,7 @@ async def read_item(request: Request):
 async def create_item(request: Request):
     data = await request.json()
     text_content = data.get("text_content", "")
-    response = await mdl.pidorasiki(text_content)  # Убедитесь, что pidorasiki также асинхронная
+    response = await mdl.chat(text_content)  # Убедитесь, что pidorasiki также асинхронная
     return JSONResponse(content={"response": response})
 
 

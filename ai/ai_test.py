@@ -4,11 +4,8 @@ import json
 import nltk
 import numpy as np
 import pickle
-from pathlib import Path
-
 from tensorflow.keras.models import load_model
 from nltk.stem import SnowballStemmer
-BASE_DIR = Path(__file__).resolve().parent
 
 # Загрузка необходимых ресурсов NLTK
 nltk.download('punkt')
@@ -17,37 +14,16 @@ nltk.download('punkt')
 stemmer = SnowballStemmer("russian")
 
 # Загрузка модели и данных
-try:
-    with open(str(BASE_DIR / 'words.pkl'), 'rb') as file:
-        words = pickle.load(file)
-except FileNotFoundError:
-    print("Файл words.pkl не найден. Убедитесь, что он находится в рабочей директории.")
-    words = []
+model = load_model('chatbot_model.h5')
 
-try:
-    with open(str(BASE_DIR / 'classes.pkl'), 'rb') as file:
-        classes = pickle.load(file)
-except FileNotFoundError:
-    print("Файл classes.pkl не найден. Убедитесь, что он находится в рабочей директории.")
-    classes = []
+with open('words.pkl', 'rb') as f:
+    words = pickle.load(f)
 
-# Загрузка intents
-try:
-    with open(str(BASE_DIR / 'intents.json'), 'r', encoding='utf-8') as file:
-        data = json.load(file)
-except FileNotFoundError:
-    print("Файл intents.json не найден. Убедитесь, что он находится в рабочей директории.")
-    intents = {"intents": []}
-
-# Загрузка модели
-try:
-    model = load_model(str(BASE_DIR / 'chatbot_model.h5'))
-except FileNotFoundError:
-    print("Файл chatbot_model.h5 не найден. Убедитесь, что он находится в рабочей директории.")
-    model = None
-
-with open(str(BASE_DIR / 'labels.pkl'), 'rb') as f:
+with open('labels.pkl', 'rb') as f:
     labels = pickle.load(f)
+
+with open('intents.json', 'r', encoding='utf-8') as file:
+    data = json.load(file)
 
 
 def preprocess_sentence(sentence):
@@ -80,12 +56,13 @@ def get_response(prediction, intents_json):
     return "Извините, я не понимаю ваш запрос."
 
 
-async def chat(message):
+def chat():
     print("Начните общение с ботом (напишите 'выход' для завершения)")
     while True:
+        message = input("Вы: ")
         if message.lower() == "выход":
-            return "До свидания"
-
+            print("Бот: До свидания!")
+            break
 
         bag = preprocess_sentence(message)
         bag = np.expand_dims(bag, axis=0)
@@ -94,5 +71,8 @@ async def chat(message):
         prediction = model.predict(bag)[0]
         response = get_response(prediction, data)
 
-        return response
+        print(f"Бот: {response}")
 
+
+if __name__ == "__main__":
+    chat()
