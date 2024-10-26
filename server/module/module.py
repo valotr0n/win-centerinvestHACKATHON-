@@ -2,18 +2,19 @@ import random
 import json
 import pickle
 import numpy as np
-
-
 import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
-
+from pathlib import Path
 from tensorflow.keras.models import load_model
+
+BASE_DIR = Path(__file__).resolve().parent
 
 # Загрузка необходимых ресурсов NLTK
 nltk.download('punkt')
 nltk.download('wordnet')
 nltk.download('stopwords')
+nltk.download('punkt_tab')
 
 # Инициализация лемматизатора и стоп-слов
 lemmatizer = WordNetLemmatizer()
@@ -21,22 +22,22 @@ stop_words = set(stopwords.words('russian'))
 
 # Загрузка данных
 try:
-    with open("../server/module/words.pkl", "rb") as f:
-        words = pickle.load(f)
+    with open(str(BASE_DIR / 'words.pkl'), 'rb') as file:
+        words = pickle.load(file)
 except FileNotFoundError:
     print("Файл words.pkl не найден. Убедитесь, что он находится в рабочей директории.")
     words = []
 
 try:
-    with open("../server/module/classes.pkl", "rb") as f:
-        classes = pickle.load(f)
+    with open(str(BASE_DIR / 'classes.pkl'), 'rb') as file:
+        classes = pickle.load(file)
 except FileNotFoundError:
     print("Файл classes.pkl не найден. Убедитесь, что он находится в рабочей директории.")
     classes = []
 
 # Загрузка intents
 try:
-    with open('../server/module/intents.json', 'r', encoding='utf-8') as json_file:
+    with open(str(BASE_DIR / 'intents.json'), 'r', encoding='utf-8') as json_file:
         intents = json.load(json_file)
 except FileNotFoundError:
     print("Файл intents.json не найден. Убедитесь, что он находится в рабочей директории.")
@@ -44,7 +45,7 @@ except FileNotFoundError:
 
 # Загрузка модели
 try:
-    model = load_model('chatbot_model.h5')
+    model = load_model(str(BASE_DIR / 'chatbot_model.h5'))
 except FileNotFoundError:
     print("Файл chatbot_model.h5 не найден. Убедитесь, что он находится в рабочей директории.")
     model = None
@@ -80,7 +81,7 @@ def predict_class(sentence, model, words, classes):
     if model is None:
         print("Модель не загружена.")
         return []
-    
+
     bow_vector = bow(sentence, words, show_details=True)
     res = model.predict(np.array([bow_vector]))[0]
     print(f"Предсказанные вероятности: {res}")  # Отладка
@@ -118,31 +119,12 @@ def chatbot_response(user_input):
     print(f"Ответ бота: {res}")  # Отладка
     return res
 
-if __name__ == "__main__":
-    print("Бот: Привет! Я ваш чат-бот. Если хотите выйти, напишите 'пока', 'до свидания' или 'выход'.")
-    while True:
-        user_input = input("Вы: ")
-        if user_input.lower() in ["пока", "до свидания", "выход"]:
-            print("Бот: До свидания!")
-            break
-        response = chatbot_response(user_input)
-        print(f"Бот: {response}")
-
-    # Пример тестирования
-    print("\n--- Тестирование с примерами предложений ---\n")
-    test_sentences = [
-        "Где общага",
-        "Где находится общежитие?",
-        "Стажировки",
-        "Мне нужна помощь с арендой жилья.",
-        "Как защитить свой банковский счёт?"
-    ]
-
-    for message in test_sentences:
-        print(f"Вы: {message}")
-        if model is not None:
-            ints = predict_class(message, model, words, classes)
-            res = get_response(ints, intents)
-            print(f"Бот: {res}\n")
-        else:
-            print("Бот: Модель не загружена, поэтому ответить не могу.\n")
+async def pidorasiki(pidor):
+    user_input = pidor
+    print(pidor)
+    if user_input.lower() in ["пока", "до свидания", "выход"]:
+        print("Бот: До свидания!")
+        return "До свидания!"
+    response = chatbot_response(user_input)
+    print(f"Бот: {response}")
+    return response

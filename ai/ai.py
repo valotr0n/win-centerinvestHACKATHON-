@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 import os
 
 # Загрузка необходимых ресурсов NLTK
+
 nltk.download('punkt')
 nltk.download('wordnet')
 nltk.download('stopwords')
@@ -32,11 +33,11 @@ stop_words = set(stopwords.words('russian'))
 # -------------- Предобработка и Подготовка Данных --------------
 
 # Проверка наличия файла 'intents.json'
-if not os.path.exists('intents.json'):
+if not os.path.exists('../server/module/intents.json'):
     raise FileNotFoundError("Файл 'intents.json' не найден в текущей директории.")
 
 # Загрузка данных из intents.json
-with open('intents.json', 'r', encoding='utf-8') as json_file:
+with open('../server/module/intents.json', 'r', encoding='utf-8') as json_file:
     intents = json.load(json_file)
 
 # Проверка содержимого intents
@@ -66,8 +67,8 @@ words = sorted(set(words))
 classes = sorted(set(classes))
 
 # Сохранение словаря слов и классов
-pickle.dump(words, open('words.pkl', 'wb'))
-pickle.dump(classes, open('classes.pkl', 'wb'))
+pickle.dump(words, open('../server/module/words.pkl', 'wb'))
+pickle.dump(classes, open('../server/module/classes.pkl', 'wb'))
 
 # Создание обучающего набора данных
 training = []
@@ -201,26 +202,3 @@ early_stop = EarlyStopping(
 # Сохранение модели
 model.save('chatbot_model.h5')  # Можно также сохранить в формате .keras
 print('Модель успешно обучена и сохранена как \'chatbot_model.h5\'')
-
-# Визуализация истории обучения
-plt.figure(figsize=(12, 4))
-
-# Визуализация потерь
-plt.subplot(1, 2, 1)
-plt.plot(hist.history['loss'], label='train_loss')
-plt.plot(hist.history['val_loss'], label='val_loss')
-plt.title('Потери во время обучения')
-plt.xlabel('Эпоха')
-plt.ylabel('Потеря')
-plt.legend()
-
-# Визуализация точности
-plt.subplot(1, 2, 2)
-plt.plot(hist.history['accuracy'], label='train_accuracy')
-plt.plot(hist.history['val_accuracy'], label='val_accuracy')
-plt.title('Точность во время обучения')
-plt.xlabel('Эпоха')
-plt.ylabel('Точность')
-plt.legend()
-
-plt.show()

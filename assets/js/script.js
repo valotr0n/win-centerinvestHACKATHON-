@@ -101,12 +101,16 @@ async function ResponseToMessage()  {
 
         // POST-запрос
         const request = new Request("http://127.0.0.1:8000/api/message", {
-          method: "POST",
-          body: JSON.stringify({ text_content: `${message_to_response}` }),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ text_content: `${message_to_response}` }),
         });
-        const response1 = await request.json();
-        console.log(response1);
-        chatBox.appendChild(createChatLi(response1['text_content'], 'chatIncoming'));
+        const response1 = await fetch(request);
+        const data = await response1.json();
+        console.log(data    );
+        chatBox.appendChild(createChatLi(data['response'], 'chatIncoming'));
 
 }
 

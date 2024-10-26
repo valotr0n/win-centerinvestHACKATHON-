@@ -3,16 +3,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
-
+from fastapi.responses import JSONResponse
+import module.module as mdl
 from typing import Union
 from pydantic import BaseModel
 
-
-# class Item(BaseModel):
-#     name: str
-#     description: Union[str, None] = None
-#     price: float
-#     tax: Union[float, None] = None
 
 
 class Item(BaseModel):
@@ -43,7 +38,11 @@ async def read_item(request: Request):
 @app.post("/api/message/")
 async def create_item(request: Request):
     data = await request.json()
-    return data
+    text_content = data.get("text_content", "")
+    response = await mdl.pidorasiki(text_content)  # Убедитесь, что pidorasiki также асинхронная
+    return JSONResponse(content={"response": response})
 
 
-
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)
