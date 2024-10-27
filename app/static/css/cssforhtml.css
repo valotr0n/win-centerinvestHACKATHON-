@@ -322,12 +322,12 @@
   }
   
   .result-box ul li {
-    background: #ffdae6;
+    background: #8dffa5;
     display: inline;
     border-radius: 8px;
     padding: 0px 8px;
     margin: 5px 0px;
-    color: #3ff93f;
+    color: #0d650d;
   }
   
   #timer {
