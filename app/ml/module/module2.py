@@ -1,3 +1,4 @@
+import requests
 from fuzzywuzzy import fuzz
 from pathlib import Path
 import json
@@ -5,6 +6,7 @@ import json
 from keras.src.utils.io_utils import print_msg
 
 import app.ml.module.config as config
+import app.ml.module.openapi as openapi
 import random
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -72,7 +74,8 @@ def recognize_cmd(cmd: str, quantity):  # Sravnivaet slova
         return result, key_words
 
 
-def execute_cmd(cmd: str):  # Ответ
+def execute_cmd(cmd: str):# Ответ
+    cmd = cmd.lower()
     if cmd == 'help':
         return "Я умею: произносить время, рассказывать анекдоты"
     elif cmd == 'ctime':
@@ -86,6 +89,8 @@ def execute_cmd(cmd: str):  # Ответ
         return random.choice(config.VA_CMD_RESP['joke'])
     elif cmd in ('right now', 'schedule tomorrow', 'schedule all', 'schedule today'):
         return 'get_lessons(cmd)'
+    elif cmd in config.VA_LINK_DICT:
+        return (openapi.hh('Python Senior'))
     else:
         return config.VA_CMD_RESP[cmd]
 
