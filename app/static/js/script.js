@@ -31,7 +31,17 @@ async function GenerateResponseToMessage(b) {
 
 // Возможный запрос сверху инпута. Изменить
 async function ForResultBox(text){
-    const results_for_box = await eel.results_box(text)();
+    const request = new Request("http://127.0.0.1:8000/api/result_box", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ text_content: `${text}` }),
+            });
+    const response1 = await fetch(request);
+    const response2 = await response1.json();
+    const results_for_box = response2['response'];
+    console.log(results_for_box)
     if (!results_for_box){
     resultsBox.style.height = "0";
     chatBoxBC.style.borderTopRightRadius = "0";
@@ -109,7 +119,7 @@ async function ResponseToMessage()  {
         });
         const response1 = await fetch(request);
         const data = await response1.json();
-        console.log(data    );
+        console.log(data);
         chatBox.appendChild(createChatLi(data['response'], 'chatIncoming'));
 
 }

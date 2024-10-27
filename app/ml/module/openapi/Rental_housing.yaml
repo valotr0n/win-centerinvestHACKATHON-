@@ -1,0 +1,213 @@
+openapi: 3.0.3
+info:
+  title: 'Rental Housing'
+  description: 'Платформа для аренды жилья'
+  version: 1.0.0
+
+tags:
+  - name: 'Объявления по аренде жилья'
+
+servers:
+  - url: 'http://rental.housing.ru'
+    description: 'URL для доступа к платформе для аренды жилья'
+
+paths:
+
+  /renta:
+    get:
+      tags:
+        - 'Объявления по аренде жилья'
+      parameters:
+        - name: filter
+          description: 'Фильтр, который позволяет сузить или расширить поиск аренды'
+          in: query
+          schema:
+            type: boolean
+            default: false
+            required: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FilterObject'
+      responses:
+        200:
+          description: 'Возвращает список всех доступных для аренды объектов'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Advertisements'
+
+  /renta/{id_advertisements}:
+    get:
+      tags:
+        - 'Объявления по аренде жилья'
+      parameters:
+        - name: id_advertisements
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '4527b1ba-2b7c-454a-a591-e83a239d4faf'
+      responses:
+        200:
+          description: 'Возвращает детали объявления по идентификатору'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Advertisements'
+
+components:
+  schemas:
+    Advertisements:
+      type: object
+      properties:
+        uid:
+          type: string
+          description: 'Уникальный идентификатор объявления в формате UUID'
+          example: '4527b1ba-2b7c-454a-a591-e83a239d4faf'
+        title:
+          type: string
+          description: 'Заголовок объявления'
+          example: 'Сдается квартира в центре'
+        description:
+          type: string
+          description: 'Описание объявления'
+          example: 'Сдаю квартиру на ул. Ленина'
+        images:
+          type: array
+          description: 'Изображения для объявления'
+          items:
+            type: string
+            description: Base64
+            format: binary
+        countOfRooms:
+          type: number
+          description: 'Количество комнат'
+        area:
+          type: number
+          description: 'Общая площадь'
+        kitchenArea:
+          type: number
+          description: 'Площадь кухни'
+        countOfFloors:
+          type: number
+          description: 'Количество этажей'
+        apartmentFloor:
+          type: number
+          description: 'Этаж, на котором находится квартира'
+        areaBathroom:
+          type: number
+          description: 'Площадь ванной'
+        typeBathroom:
+          type: string
+          description: 'Тип ванной'
+          oneOf:
+            - title: 'Совмещенная'
+            - title: 'Раздельная'
+        typeRepair:
+          type: string
+          description: 'Тип ремонта'
+          oneOf:
+            - title: 'Косметический'
+            - title: 'Капитальный'
+            - title: 'Эконом'
+            - title: 'Люкс'
+            - title: 'Стандарт'
+            - title: 'Дизайнерский'
+            - title: 'Премиум'
+        furniture:
+          type: array
+          description: 'Наличие мебели'
+          items:
+            type: string
+            description: 'Предметы, которые включены в жилье. Могут содержать указания по категориям и описания для четкого представления о мебели.'
+        equipment:
+          type: array
+          description: 'Наличие техники'
+          items:
+            type: string
+            description: 'Предметы, которые включены в жилье (например, холодильник, стиральная машина). Могут содержать указания по категориям и описания для четкого представления о технике.'
+        rentalTerms:
+          type: array
+          description: 'Условия аренды. Например, минимальный срок, аванс при подписании договора и т.п.'
+          items:
+            type: object
+            properties:
+              typeOfTerms:
+                description: 'Категория условий'
+                type: string
+              valueOfTerms:
+                type: string
+                description: 'Значение условия'
+        rules:
+          type: array
+          description: 'Правила аренды. Например, разрешение на курение и животных, использование общих зон и т.п.'
+          items:
+            type: object
+            properties:
+              typeOfRule:
+                description: 'Категория правила'
+                type: string
+              valueOfRules:
+                description: 'Значение правила'
+                type: string
+        address:
+          type: string
+          description: 'Адрес объекта'
+          example: 'Ростовская обл., Ростов, ул. Ленина, 116А'
+        contacts:
+          $ref: '#/components/schemas/Contacts'
+
+    Contacts:
+      type: object
+      properties:
+        idOwner:
+          type: string
+          description: 'Уникальный идентификатор владельца объявления'
+          example: '4527b1ba-2b7c-454a-a591-e83a239d4faf'
+        phoneNumber:
+          type: string
+          description: 'Номер телефона владельца объявления'
+        email:
+          type: string
+          description: 'Электронный адрес владельца'
+
+    FilterObject:
+      type: object
+      description: 'Фильтр, используемый для сужения поиска'
+      properties:
+        minSum:
+          description: 'Минимальная сумма аренды'
+          type: number
+        maxSum:
+          description: 'Максимальная сумма аренды'
+          type: number
+        keyWords:
+          type: array
+          description: 'Ключевые слова в запросе, которые используются для поиска объявлений'
+          items:
+            type: string
+        typeCountOfRooms:
+          type: array
+          description: 'Типы количества комнат, которые интересуют пользователя'
+          items:
+            type: object
+            properties:
+              typeOfRoom:
+                description: 'Количество комнат (например, однокомнатная, двухкомнатная)'
+                type: string
+        minArea:
+          description: 'Минимальная площадь жилья'
+          type: number
+        maxArea:
+          description: 'Максимальная площадь жилья'
+          type: number
+        minFloor:
+          description: 'Минимальный этаж, на котором находится квартира'
+          type: number
+        maxFloor:
+          description: 'Максимальный этаж, на котором находится квартира'
+          type: number

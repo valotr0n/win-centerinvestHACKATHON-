@@ -6,7 +6,7 @@ import json
 import os
 
 
-relative_path = r"C:/Users/belos/Desktop/hack/app/ml/module/model-vosk"
+relative_path = r"C:/Users/belos/Desktop/hackvanya/app/ml/module/model-vosk"
 absolute_path = os.path.abspath(relative_path)
 model = vosk.Model(f"{absolute_path}")
 

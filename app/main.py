@@ -5,9 +5,9 @@ from app.users.router import router as users_router
 from app.pages.router import router as pages_router
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse
-from app.ml.module.module import chat
+# from app.ml.module.module import chat
 import app.ml.module.stt  as stt
-import app.ml.module.fuzzwuzz  as fz
+import app.ml.module.module2  as fz
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -36,14 +36,25 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization", "Set-Cookie", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers"],
 )
 
-@app.post("/api/message")
+
+class Item(BaseModel):
+    message: str
+
+@app.post("/api/message/")
 async def create_item(request: Request):
     data = await request.json()
     text_content = data.get("text_content", "")
-    response = await chat(text_content)  # Убедитесь, что pidorasiki также асинхронная
+    response = fz.getUserMessage(text_content)
     return JSONResponse(content={"response": response})
 
 
+
+@app.post("/api/result_box")
+async def result_box(request: Request):
+    data = await request.json()
+    text_content = data.get("text_content", "")
+    response = fz.results_box(text_content)
+    return JSONResponse(content={"response": response})
 
 
     
