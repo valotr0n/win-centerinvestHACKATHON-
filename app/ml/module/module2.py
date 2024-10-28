@@ -1,9 +1,6 @@
-import requests
 from fuzzywuzzy import fuzz
 from pathlib import Path
-import json
 
-from keras.src.utils.io_utils import print_msg
 
 import app.ml.module.config as config
 import app.ml.module.openapi as openapi

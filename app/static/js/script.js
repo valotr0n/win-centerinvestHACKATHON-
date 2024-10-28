@@ -18,7 +18,7 @@ const voiceBtn = document.querySelector('#VoiceChat');
 
 
 
-var record = true;
+let record = false;
 
 
 // ChatBox
@@ -93,7 +93,8 @@ const createChatLi = (message, className) => {
 
 // Отправить
 async function ResponseToMessage()  {
-        record = false;
+        StopRecord();
+        let record = false;
         resultsBox.innerHTML = '';
         timer.style.display = 'none';
         sentBtn.style.display = 'none';
@@ -109,27 +110,28 @@ async function ResponseToMessage()  {
         console.log(`${message_to_response}`)
 
 
-        // POST-запрос
-        const request = new Request("http://127.0.0.1:8000/api/message", {
+        // GET-запрос
+        const request2 = new Request("http://127.0.0.1:8000/api/message", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ text_content: `${message_to_response}` }),
         });
-        const response1 = await fetch(request);
+        const response1 = await fetch(request2);
         const data = await response1.json();
         console.log(data);
         chatBox.appendChild(createChatLi(data['response'], 'chatIncoming'));
 
 }
 
+
 async function RecordVoice(){
   record = true;
-  console.log('возня');
+  console.log('начало записи');
 
-  const request = new Request("/api/voice/start_voice/1", {
-      method: "POST",
+  new Request("/api/voice/start_voice/1", {
+      method: "GET",
       headers: {
           "Content-Type": "application/json"
       },
@@ -137,6 +139,7 @@ async function RecordVoice(){
 
   sentBtn.style.display = 'block';
   VoiceChat.style.display = 'none';
+
   while (record) {
       const response = await fetch('/api/voice/recognize/');
       const data = await response.json();
@@ -147,11 +150,20 @@ async function RecordVoice(){
       }
       await new Promise(resolve => setTimeout(resolve, 10)); // Пауза в 1 секунду
   }
-  textarea.value = ''
+  
+  textarea.value = '';
 }
 
 
 
+function StopRecord(){
+        new Request("http://127.0.0.1:8000/api/voice/stop/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
+}
 
 
 

@@ -1,21 +1,15 @@
-from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.middleware import RefreshTokenMiddleware
 from app.users.router import router as users_router
 from app.pages.router import router as pages_router
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, JSONResponse
-# from app.ml.module.module import chat
 import app.ml.module.stt  as stt
 import app.ml.module.module2  as fz
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from pathlib import Path
 from fastapi.responses import JSONResponse
 from typing import Union
 from pydantic import BaseModel
+from sqlalchemy import false
 
 app = FastAPI()
 
@@ -77,6 +71,13 @@ async def recognize_audio():
     except StopIteration:
         return JSONResponse(content={"result": "No more data"}, status_code=404)
 
+
+@app.post("/api/voice/stop/")
+def stop_record():
+    global gen
+    gen = None
+    start_voice(0)
+
 def start_voice(x):
     global gen
     if x == 1:
@@ -86,9 +87,13 @@ def start_voice(x):
         gen = '1'
         return gen
 
+
+
+
 def record_voice():
-    global gen  # Используем глобальную переменную
-    return next(gen)
+    global gen
+    if gen:
+        return next(gen)
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)
